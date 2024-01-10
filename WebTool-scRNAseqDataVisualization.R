@@ -2,27 +2,7 @@ library(shiny)
 library(ggplot2)
 library(ggpubr)
 library(RColorBrewer)
-library(shinymanager)
 library(Matrix)
-
-inactivity <- "function idleTimer() {
-var t = setTimeout(logout, 300000); // 5 mins
-window.onmousemove = resetTimer; // catches mouse movements
-window.onmousedown = resetTimer; // catches mouse movements
-window.onclick = resetTimer;     // catches mouse clicks
-window.onscroll = resetTimer;    // catches scrolling
-window.onkeypress = resetTimer;  //catches keyboard actions
-
-function logout() {
-window.close();  //close the window
-}
-
-function resetTimer() {
-clearTimeout(t);
-t = setTimeout(logout, 300000);  // time is in milliseconds (1000 is 1 second)
-}
-}
-idleTimer();"
 
 choice.gene <- readRDS('choice.gene.rds')
 
@@ -34,19 +14,18 @@ Matrix.Patient <- readRDS('Patient.Counts.rds')
 
 ind <- meta.patient$CellType == 'Malignant'
 meta.malignant <- meta.patient[ind,]
+# Matrix.Malignant <- Matrix.Patient[,ind]
 
-ui <- secure_app(
-  head_auth = tags$script(inactivity),
-  navbarPage(
+ui <- navbarPage(
     "GBMConnectivity",
     tabPanel("Introduction",
              mainPanel(
                br(),
-               p("Welcome to the interactive webtool!"),
+               p("Welcome to the interactive webtool for the connectivity in glioblastoma!"),
                p(
-                 "It enables users to visualize and further explore scRNA-seq data of paper:"
+                 "It enables users to visualize and further explore the scRNA-seq datasets from paper:"
                ),
-               p(strong("A connectivity signature in glioblastoma")),
+               p(strong("A clinically applicable connectivity signature for glioblastoma includes the tumor network driver CHI3L1")),
                br(),
                p("There are two datasets available:"),
                p(
@@ -59,7 +38,7 @@ ui <- secure_app(
                ),
                p("Please go to next tab for further exploring data!"),
                br(),
-               p("The data is available in GEO database under the accession number GSE161008.")
+               p("The data is available in EGA database under the accession number EGAS00001007611.")
              )),
     tabPanel("Metadata",
              mainPanel(
@@ -201,8 +180,7 @@ ui <- secure_app(
                  plotOutput("Boxplot.Patient"))
       ))
     )
-  )
-)
+ )
 
 server <- function(input, output, session) {
   
